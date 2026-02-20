@@ -1,19 +1,51 @@
 #include <QCoreApplication>
+#include <QTimer>
+
+#include "databasemanager.h"
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    if (true) // argc == 2
+    {
+        //
+        QCoreApplication a(argc, argv);
 
-    // Set up code that uses the Qt event loop here.
-    // Call a.quit() or a.exit() to quit the application.
-    // A not very useful example would be including
-    // #include <QTimer>
-    // near the top of the file and calling
-    // QTimer::singleShot(5000, &a, &QCoreApplication::quit);
-    // which quits the application after 5 seconds.
+        //
+        std::unique_ptr<DatabaseManager> manager;
 
-    // If you do not need a running Qt event loop, remove the call
-    // to a.exec() or use the Non-Qt Plain C++ Application template.
+        //
+        QTimer::singleShot(100,
+                           [&manager]()
+                           {
+                               manager = std::make_unique<DatabaseManager>("8080");
 
-    return a.exec();
+                               QString data = "\vТитаник\vСвободно";
+
+                               PGresult* r = manager->SelectShip(1, data);
+                               qDebug() << PQresultStatus(r);
+                               int row = PQntuples(r);
+                               int field = PQnfields(r);
+                               qDebug() << row;
+                               qDebug() << field;
+                               for (int i = 0; i < row; i++)
+                               {
+                                   for (int j = 0; j < field; j++)
+                                   {
+                                       qDebug() << "row: " << i << ' ' << "field: " << j << "null: " << PQgetisnull(r, i, j) << "v: " << PQgetvalue(r, i, j);
+                                   }
+                               }
+
+                               PQclear(r);
+                           });
+
+        //
+        return a.exec();
+    }
+    else
+    {
+        //
+        qDebug() << "Error in launch parameters";
+
+        return 0;
+    }
 }
