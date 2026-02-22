@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include <QTimer>
 
-#include "databasemanager.h"
+#include "authorizationmodule.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,31 +11,19 @@ int main(int argc, char *argv[])
         QCoreApplication a(argc, argv);
 
         //
-        std::unique_ptr<DatabaseManager> manager;
+        std::unique_ptr<AuthorizationModule> auth;
 
         //
         QTimer::singleShot(100,
-                           [&manager]()
+                           [&auth]()
                            {
-                               manager = std::make_unique<DatabaseManager>("8080");
+                               DatabaseManager* manager = new DatabaseManager("8080");
+                               QMutex* mutex = new QMutex;
 
-                               QString data = "\vТитаник\vСвободно";
+                               auth.reset(new AuthorizationModule(manager, mutex));
 
-                               PGresult* r = manager->SelectShip(1, data);
-                               qDebug() << PQresultStatus(r);
-                               int row = PQntuples(r);
-                               int field = PQnfields(r);
-                               qDebug() << row;
-                               qDebug() << field;
-                               for (int i = 0; i < row; i++)
-                               {
-                                   for (int j = 0; j < field; j++)
-                                   {
-                                       qDebug() << "row: " << i << ' ' << "field: " << j << "null: " << PQgetisnull(r, i, j) << "v: " << PQgetvalue(r, i, j);
-                                   }
-                               }
-
-                               PQclear(r);
+                               qDebug() << "";
+                               auth->ChooseAction("00sidorov_s\vsidor123");
                            });
 
         //
