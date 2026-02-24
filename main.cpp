@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include <QTimer>
 
-#include "administrationmodule.h"
+#include "customsmodule.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
         QCoreApplication a(argc, argv);
 
         //
-        std::unique_ptr<AdministrationModule> auth;
+        std::unique_ptr<CustomsModule> auth;
 
         //
         QTimer::singleShot(100,
@@ -20,13 +20,21 @@ int main(int argc, char *argv[])
                                DatabaseManager* manager = new DatabaseManager("8080");
                                QMutex* mutex = new QMutex;
 
-                               auth.reset(new AdministrationModule(manager, mutex));
+                               auth.reset(new CustomsModule(manager, mutex));
 
-                               QString data =
-                                   "petrov_disp\v"       // 6 старый логин
-                                   "petrov2026";        // 7 старый пароль
+                               QString data = "sidorov_s\v00004-24/ОМиДР";
+                               QString result = auth->SelectWorkBid(data);
 
-                               qDebug() << auth->DeleteUser(data);
+                               if (result == "\x00") {
+                                   qDebug() << "❌ Заявка не найдена";
+                               } else if (result == "\x1A") {
+                                   qDebug() << "❌ Заявка не в статусе 'Направлена в таможню'";
+                               } else if (result == "\x18") {
+                                   qDebug() << "❌ Ошибка БД";
+                               } else {
+                                   qDebug() << "✅ Заявка взята в обработку, предыдущий статус:" << result;
+                                   // Статус в БД теперь "Обрабатывается в таможне"
+                               }
                            });
 
         //

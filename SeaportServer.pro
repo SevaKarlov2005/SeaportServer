@@ -9,6 +9,7 @@ CONFIG += c++17 cmdline
 SOURCES += \
         administrationmodule.cpp \
         authorizationmodule.cpp \
+        customsmodule.cpp \
         databasemanager.cpp \
         main.cpp
 
@@ -25,4 +26,5 @@ INCLUDEPATH += "D:/PostgreSQL/include"
 HEADERS += \
     administrationmodule.h \
     authorizationmodule.h \
+    customsmodule.h \
     databasemanager.h
