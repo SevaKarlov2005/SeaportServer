@@ -7,6 +7,7 @@ CONFIG += c++17 cmdline
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        administrationmodule.cpp \
         authorizationmodule.cpp \
         databasemanager.cpp \
         main.cpp
@@ -22,5 +23,6 @@ else:win32:CONFIG(debug, debug|release): LIBS += "D:/PostgreSQL/lib/libpq.lib"
 INCLUDEPATH += "D:/PostgreSQL/include"
 
 HEADERS += \
+    administrationmodule.h \
     authorizationmodule.h \
     databasemanager.h

@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include <QTimer>
 
-#include "authorizationmodule.h"
+#include "administrationmodule.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
         QCoreApplication a(argc, argv);
 
         //
-        std::unique_ptr<AuthorizationModule> auth;
+        std::unique_ptr<AdministrationModule> auth;
 
         //
         QTimer::singleShot(100,
@@ -20,10 +20,13 @@ int main(int argc, char *argv[])
                                DatabaseManager* manager = new DatabaseManager("8080");
                                QMutex* mutex = new QMutex;
 
-                               auth.reset(new AuthorizationModule(manager, mutex));
+                               auth.reset(new AdministrationModule(manager, mutex));
 
-                               qDebug() << "";
-                               auth->ChooseAction("00sidorov_s\vsidor123");
+                               QString data =
+                                   "petrov_disp\v"       // 6 старый логин
+                                   "petrov2026";        // 7 старый пароль
+
+                               qDebug() << auth->DeleteUser(data);
                            });
 
         //
