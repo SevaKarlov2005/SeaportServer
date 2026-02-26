@@ -11,6 +11,7 @@ SOURCES += \
         authorizationmodule.cpp \
         customsmodule.cpp \
         databasemanager.cpp \
+        distributionmodule.cpp \
         main.cpp
 
 # Default rules for deployment.
@@ -27,4 +28,5 @@ HEADERS += \
     administrationmodule.h \
     authorizationmodule.h \
     customsmodule.h \
-    databasemanager.h
+    databasemanager.h \
+    distributionmodule.h
