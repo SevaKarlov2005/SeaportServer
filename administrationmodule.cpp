@@ -208,6 +208,7 @@ QString AdministrationModule::SelectUpdateBid(QString data)
 
     // Результат работы
     QString message;
+    QStringList list;
     int found;
 
     // Установка заявки в обработку
@@ -229,6 +230,16 @@ QString AdministrationModule::SelectUpdateBid(QString data)
             // Если заявка не занята
             if (message == "Направлена в таможню" || message == "Направлена на склад")
             {
+                int counter = PQnfields(result);
+
+                for (int i = 0; i < counter; i++)
+                {
+                    if (PQgetisnull(result, 0, i) == 1)
+                        list.append("");
+                    else
+                        list.append(PQgetvalue(result, 0, i));
+                }
+
                 // Занимаем её
                 PQclear(result);
                 result = manager->UpdateBid(0, "Обрабатывается администратором\v" + data_list[0] + '\v' + data_list[1]);
@@ -251,6 +262,8 @@ QString AdministrationModule::SelectUpdateBid(QString data)
         {
             if (message != "Направлена в таможню" && message != "Направлена на склад")
                 message = "\x1A";
+            else
+                message = list.join('\v');
         }
     }
 
