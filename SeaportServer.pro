@@ -12,7 +12,8 @@ SOURCES += \
         customsmodule.cpp \
         databasemanager.cpp \
         distributionmodule.cpp \
-        main.cpp
+        main.cpp \
+        planningmodule.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -29,4 +30,5 @@ HEADERS += \
     authorizationmodule.h \
     customsmodule.h \
     databasemanager.h \
-    distributionmodule.h
+    distributionmodule.h \
+    planningmodule.h
