@@ -545,6 +545,8 @@ QString PlanningModule::AssignShip(QString data)
                     else
                         is_wrong = ship_type[0] != PQgetvalue(result, 0, 2) && ship_type[1] != PQgetvalue(result, 0, 2);
 
+                    is_wrong = is_wrong && !(data_list[8] == PQgetvalue(result, 0, 4));
+
                     if (!is_wrong)
                     {
                         PQclear(result);

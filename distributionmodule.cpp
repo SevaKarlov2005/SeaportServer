@@ -348,7 +348,7 @@ QString DistributionModule::CheckDistribution(QString data)
     QString message;
     bool is_right = true;
 
-    //
+    // Проверка распределения
     mutex->lock();
 
     // Получение контейнеров тальмана
@@ -597,6 +597,24 @@ QString DistributionModule::AssignCase(QString data)
     // Результат работы
     QString message;
     bool is_find = true;
+    bool is_wrong = false;
+
+    // Выбор группы контейнеров
+    int code = data_list[6].sliced(0, 2).toInt();
+    QStringList case_group;
+
+    if ((code >= 1 && code <= 8) || code == 15 || (code >= 16 && code <= 21) || code == 30)
+        case_group = {"R0", "R1", "R2", "R3"};
+    else if (code == 22 || code == 27 || (code >= 28 && code <= 29) || (code >= 31 && code <= 38))
+        case_group = {"UT", "TN", "HR"};
+    else if ((code >= 9 && code <= 10) || code == 23 || (code >= 25 && code <= 26))
+        case_group = {"B0", "B1", "B3", "B4", "B5", "B6"};
+    else if (code >= 11 && code <= 14)
+        case_group = {"V0", "V2", "V4"};
+    else if ((code >= 44 && code <= 46) || (code >= 72 && code <= 83) || (code >= 86 && code <= 89))
+        case_group = {"PL", "S0", "S1", "S2"};
+    else
+        case_group = {"G0", "G1", "G2", "G3"};
 
     // Назначение контейнера
     mutex->lock();
@@ -610,10 +628,15 @@ QString DistributionModule::AssignCase(QString data)
 
         if (is_find)
         {
-            PQclear(result);
+            is_wrong = !case_group.contains(PQgetvalue(result, 0, 7));
 
-            // Смена статуса у контейнера
-            result = manager->UpdateCase(0, "Обрабатывается на складе\v" + data_list[5] + '\v' + data_list.sliced(0, 4).join('\v'));
+            if (!is_wrong)
+            {
+                PQclear(result);
+
+                // Смена статуса у контейнера
+                result = manager->UpdateCase(0, "Обрабатывается на складе\v" + data_list[5] + '\v' + data_list.sliced(0, 4).join('\v'));
+            }
         }
     }
 
@@ -626,6 +649,8 @@ QString DistributionModule::AssignCase(QString data)
     {
         if (!is_find)
             message = "\x00";
+        else if (is_wrong)
+            message = "2";
         else
             message = "1";
 

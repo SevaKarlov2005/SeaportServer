@@ -386,6 +386,7 @@ DatabaseManager::DatabaseManager(const char* port)
                         "IMO_number CHAR(7) NOT NULL UNIQUE, "
                         "ship_type INT NOT NULL, "
                         "ship_name VARCHAR(30) NOT NULL, "
+                        "ship_country VARCHAR(30) NOT NULL, "
                         "ship_status INT NOT NULL, "
                         "ship_payload NUMERIC(11, 3) NOT NULL, "
                         "ship_load NUMERIC(11, 3) NOT NULL, "
@@ -1900,7 +1901,8 @@ PGresult* DatabaseManager::SelectCase(unsigned short mod, QString data)
                     "LEFT JOIN bid AS b ON c.bid=b.bid_id "
                     "LEFT JOIN employee AS e ON c.employee=e.employee_id "
                     "WHERE "
-                    "c.owner_code='%1' AND eq.equipment_type='%2' AND c.serial_number='%3' AND c.check_number=%4  AND st.container_status='%5';";
+                    "c.owner_code='%1' AND eq.equipment_type='%2' AND c.serial_number='%3' AND c.check_number=%4 AND "
+                    "st.container_status LIKE '%5';";
             query = query.arg(data_list[0]).arg(data_list[1]).arg(data_list[2]).arg(data_list[3]).arg(data_list[4]);
         }
 
@@ -2481,7 +2483,7 @@ PGresult* DatabaseManager::SelectShip(unsigned short mod, QString data)
                     "JOIN ship_type AS t ON s.ship_type=t.ship_type_id "
                     "JOIN ship_status AS st ON s.ship_status=st.ship_status_id "
                     "LEFT JOIN employee AS e ON s.employee=e.employee_id "
-                    "WHERE s.ship_country='%1' AND st.ship_status='%2' AND t.ship_type IN (%3);";
+                    "WHERE s.ship_country='%1' AND st.ship_status LIKE '%2' AND t.ship_type IN (%3);";
             query = query.arg(data_list[0]).arg(data_list[1]).arg(where);
         }
 
@@ -2624,6 +2626,23 @@ PGresult* DatabaseManager::UpdateShip(unsigned short mod, QString data)
                     "ship_load=%1 "
                     "WHERE IMO_number='%2';";
             query = query.arg(data_list[0]).arg(data_list[1]);
+        }
+
+        // Полное изменение морского судна по IMO номеру
+        if (mod == 3)
+        {
+            query = "UPDATE ship "
+                    "SET "
+                    "IMO_number='%1', "
+                    "ship_type='%2', "
+                    "ship_name='%3', "
+                    "ship_country='%4', "
+                    "ship_status='%5', "
+                    "ship_payload=%6, "
+                    "ship_load=%7 "
+                    "WHERE IMO_number='%8';";
+            query = query.arg(data_list[0]).arg(data_list[1]).arg(data_list[2]).arg(data_list[3]).arg(data_list[4]).arg(data_list[5])
+                         .arg(data_list[6]).arg(data_list[7]);
         }
 
         // Выполнение запроса

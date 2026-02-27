@@ -119,7 +119,6 @@ QString LoadingModule::SelectWorkCase(QString data)
 
 QString LoadingModule::Reception(QString data)
 {
-    // Комментарий Статус контейнера Контейнер
     // Извлечение данных
     QStringList data_list = data.split('\v');
 

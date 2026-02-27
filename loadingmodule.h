@@ -13,6 +13,7 @@ private:
     QMutex* mutex;
 public:
     explicit LoadingModule(DatabaseManager* manager, QMutex* mutex, QObject *parent = nullptr);
+    void ChooseAction(QString data);
     QString FreeCase(QString data);
     QString SelectWorkCase(QString data);
     QString Reception(QString data);
