@@ -12,6 +12,7 @@ SOURCES += \
         customsmodule.cpp \
         databasemanager.cpp \
         distributionmodule.cpp \
+        loadingmodule.cpp \
         main.cpp \
         planningmodule.cpp
 
@@ -31,4 +32,5 @@ HEADERS += \
     customsmodule.h \
     databasemanager.h \
     distributionmodule.h \
+    loadingmodule.h \
     planningmodule.h
