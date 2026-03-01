@@ -232,7 +232,7 @@ QString PlanningModule::SuggestPlan(QString data)
 
                                                     for (int r = 0; r < PQntuples(places); r++)
                                                     {
-                                                        if ((alphabet[j] + QString::number(g).fill('0', 2)) == PQgetvalue(places, r, 0))
+                                                        if ((alphabet[j] + QString::number(g).rightJustified(2, '0')) == PQgetvalue(places, r, 0))
                                                         {
                                                             is_in = true;
                                                             break;
@@ -242,7 +242,7 @@ QString PlanningModule::SuggestPlan(QString data)
                                                     if (!is_in)
                                                     {
                                                         message = country + '\v' + PQgetvalue(result, i, 1) + '\v' +
-                                                                  alphabet[j] + QString::number(g).fill('0', 2);
+                                                                  alphabet[j] + QString::number(g).rightJustified(2, '0');
 
                                                         for (int u = 0; u < PQntuples(places); u++)
                                                             message += ('\v' + QString(PQgetvalue(places, u, 0)));
