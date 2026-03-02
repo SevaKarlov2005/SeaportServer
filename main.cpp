@@ -1,38 +1,39 @@
 #include <QCoreApplication>
 #include <QTimer>
 
-#include "distributionmodule.h"
+#include "tcpserver.h"
 
 int main(int argc, char *argv[])
 {
-    if (true) // argc == 2
+    if (argc == 2)
     {
-        //
-        QCoreApplication a(argc, argv);
+        bool ok;
+        int port = QString(argv[1]).toInt(&ok);
 
-        //
-        std::unique_ptr<DistributionModule> auth;
+        if (ok)
+        {
+            ok = (port > 0) && (port < 65536);
 
-        //
-        QTimer::singleShot(100,
-                           [&auth]()
-                           {
-                               DatabaseManager* manager = new DatabaseManager("8080");
-                               QMutex* mutex = new QMutex;
+            if (ok)
+            {
+                QCoreApplication a(argc, argv);
 
-                               auth.reset(new DistributionModule(manager, mutex));
+                // Указатель на сервер
+                std::unique_ptr<TCPServer> ptr;
 
+                // Запуск сервера
+                QTimer::singleShot(50, [&ptr, &argv](){ ptr.reset(new TCPServer(argv[1])); });
 
-                           });
-
-        //
-        return a.exec();
+                return a.exec();
+            }
+            else
+                qDebug() << "Invalid range";
+        }
+        else
+            qDebug() << "Invalid parameter type";
     }
     else
-    {
-        //
-        qDebug() << "Error in launch parameters";
+        qDebug() << "Incorrect number of parameters";
 
-        return 0;
-    }
+    return 0;
 }

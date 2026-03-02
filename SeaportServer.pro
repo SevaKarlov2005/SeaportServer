@@ -1,4 +1,4 @@
-QT = core
+QT = core network
 
 CONFIG += c++17 cmdline
 
@@ -14,17 +14,24 @@ SOURCES += \
         distributionmodule.cpp \
         loadingmodule.cpp \
         main.cpp \
-        planningmodule.cpp
+        planningmodule.cpp \
+        tcpserver.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-win32:CONFIG(release, debug|release): LIBS += "D:/PostgreSQL/lib/libpq.lib"
-else:win32:CONFIG(debug, debug|release): LIBS += "D:/PostgreSQL/lib/libpq.lib"
+win32:CONFIG(release, debug|release): LIBS += "D:/PostgreSQL/lib/libpq.lib" \
+                                              "D:/LIB/OpenSSL/OpenSSL-Win64/lib/VC/x64/MD/libcrypto.lib" \
+                                              "D:/LIB/OpenSSL/OpenSSL-Win64/lib/VC/x64/MD/libssl.lib"
+else:win32:CONFIG(debug, debug|release): LIBS += "D:/PostgreSQL/lib/libpq.lib" \
+                                                 "D:/LIB/OpenSSL/OpenSSL-Win64/lib/VC/x64/MD/libcrypto.lib" \
+                                                 "D:/LIB/OpenSSL/OpenSSL-Win64/lib/VC/x64/MD/libssl.lib"
 
-INCLUDEPATH += "D:/PostgreSQL/include"
+INCLUDEPATH += "D:/PostgreSQL/include" \
+               "D:/LIB/OpenSSL/OpenSSL-Win64/include"
+
 
 HEADERS += \
     administrationmodule.h \
@@ -33,4 +40,5 @@ HEADERS += \
     databasemanager.h \
     distributionmodule.h \
     loadingmodule.h \
-    planningmodule.h
+    planningmodule.h \
+    tcpserver.h
