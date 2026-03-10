@@ -1,6 +1,7 @@
 #include "distributionmodule.h"
 
 #include <QMap>
+#include <QDebug>
 
 DistributionModule::DistributionModule(DatabaseManager* manager, QMutex* mutex, QObject *parent) : QObject{parent}
 {
@@ -207,11 +208,12 @@ QString DistributionModule::SuggestDistribution(QString data)
     int result_start = 0;
     int result_finish = -1;
     int case_count = 2147483647;
+    int result_quantity = 1;
 
     // Назначение контейнеров
     mutex->lock();
 
-    PGresult* result = manager->SelectCase(4, case_group + '\v' + "Свободен");
+    PGresult* result = manager->SelectCase(4, "Свободен\v" + case_group);
 
     if (result)
     {
@@ -273,11 +275,12 @@ QString DistributionModule::SuggestDistribution(QString data)
                         case_count = finish - start + 1;
                         result_start = start;
                         result_finish = finish;
+                        result_quantity = cargo_quantity;
                     }
                 }
             }
 
-            is_find = cargo_quantity <= 0;
+            is_find = result_quantity <= 0;
 
             // Занимаем контейнеры
             if (is_find)
@@ -1220,7 +1223,7 @@ QString DistributionModule::DeleteCaseByBid(QString data)
                     int success = QString(PQgetvalue(result, 0, 0)).toInt();
                     is_busy = all != success;
 
-                    if (!is_busy)
+                    if (is_busy)
                     {
                         PQclear(result);
 
@@ -1238,6 +1241,12 @@ QString DistributionModule::DeleteCaseByBid(QString data)
                                 result = manager->DeleteCase(1, data);
                             }
                         }
+                    }
+                    else
+                    {
+                        PQclear(result);
+
+                        result = manager->DeleteCase(1, data);
                     }
                 }
             }

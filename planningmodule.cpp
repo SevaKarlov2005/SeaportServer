@@ -1,6 +1,7 @@
 #include "planningmodule.h"
 
 #include <QMap>
+#include <QDebug>
 
 PlanningModule::PlanningModule(DatabaseManager* manager, QMutex* mutex, QObject *parent) : QObject{parent}
 {
@@ -139,7 +140,6 @@ QString PlanningModule::SuggestPlan(QString data)
     bool is_case = true;
     bool is_bid = true;
     bool is_find = true;
-
     bool placesError = false;
 
     // Таблица тип контейнера -> тип морского судна
@@ -186,6 +186,7 @@ QString PlanningModule::SuggestPlan(QString data)
             QString container_type = PQgetvalue(result, 0, 7);
             int gross = qRound(QString(PQgetvalue(result, 0, 8)).toDouble() * 1000);
             PQclear(result);
+            result = NULL;
 
             result = manager->SelectBid(1, bid_number);
 
@@ -197,6 +198,7 @@ QString PlanningModule::SuggestPlan(QString data)
                 {
                     QString country = PQgetvalue(result, 0, 28);
                     PQclear(result);
+                    result = NULL;
 
                     result = manager->SelectShip(3, country + "\v%\v" + table[container_type]);
 
@@ -257,7 +259,7 @@ QString PlanningModule::SuggestPlan(QString data)
                                         }
 
                                         PQclear(places);
-                                        places = nullptr;
+                                        places = NULL;
                                     }
                                 }
 
@@ -272,13 +274,34 @@ QString PlanningModule::SuggestPlan(QString data)
                                 QString IMO_number = message.split('\v')[1];
 
                                 PQclear(result);
+                                result = NULL;
 
-                                result = manager->UpdateShip(0, "Обрабатывается\v" + IMO_number + '\v' + data_list[4]);
+                                result = manager->UpdateShip(0, "Обрабатывается\v" + data_list[4] + "\v" + IMO_number);
                             }
+                            else
+                            {
+                                PQclear(result);
+                                result = NULL;
+                            }
+                        }
+                        else
+                        {
+                            PQclear(result);
+                            result = NULL;
                         }
                     }
                 }
+                else
+                {
+                    PQclear(result);
+                    result = NULL;
+                }
             }
+        }
+        else
+        {
+            PQclear(result);
+            result = NULL;
         }
     }
 
@@ -290,16 +313,23 @@ QString PlanningModule::SuggestPlan(QString data)
         message = "\x18";
 
         if (result)
+        {
             PQclear(result);
+            result = NULL;
+        }
 
         if (places)
+        {
             PQclear(places);
+            places = NULL;
+        }
     }
     else if (!is_case || !is_bid)
     {
         message = "\x00";
 
         PQclear(result);
+        result = NULL;
     }
     else
     {
@@ -307,6 +337,7 @@ QString PlanningModule::SuggestPlan(QString data)
             message = "\x00";
 
         PQclear(result);
+        result = NULL;
     }
 
     return message;
@@ -320,6 +351,7 @@ QString PlanningModule::CheckPlan(QString data)
     // Результат работы
     QString message = "";
     bool is_right = true;
+    bool is_overfull = false;
 
     // Проверка плана погрузки
     mutex->lock();
@@ -343,6 +375,7 @@ QString PlanningModule::CheckPlan(QString data)
                 long long load = qRound(QString(PQgetvalue(result, 0, 7)).toDouble() * 1000);
 
                 is_right = (load + gross) <= payload;
+                is_overfull = !is_right;
 
                 if (is_right)
                 {
@@ -376,7 +409,12 @@ QString PlanningModule::CheckPlan(QString data)
     else
     {
         if (!is_right)
-            message = "2";
+        {
+            if (is_overfull)
+                message = "3";
+            else
+                message = "2";
+        }
         else
             message = "1";
 
@@ -536,7 +574,7 @@ QString PlanningModule::AssignShip(QString data)
 
             if (is_find)
             {
-                is_busy = QString(PQgetvalue(result, 0, 5)) != "Свободен" && QString(PQgetvalue(result, 0, 5)) != "Погрузка";
+                is_busy = QString(PQgetvalue(result, 0, 5)) != "Свободно" && QString(PQgetvalue(result, 0, 5)) != "Погрузка";
 
                 if (!is_busy)
                 {

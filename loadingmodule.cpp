@@ -144,7 +144,7 @@ QString LoadingModule::Reception(QString data)
             if (result)
             {
                 PQclear(result);
-                result = manager->SelectCase(11, "Не погружен\v" + bid_number);
+                result = manager->SelectCase(11, bid_number + "\vНе погружен");
 
                 if (result)
                 {
@@ -165,7 +165,7 @@ QString LoadingModule::Reception(QString data)
                             int all = QString(PQgetvalue(result, 0, 0)).toInt();
 
                             PQclear(result);
-                            result = manager->SelectCase(11, "Погружен\v" + bid_number);
+                            result = manager->SelectCase(11, bid_number + "\vПогружен");
 
                             if (result)
                             {
